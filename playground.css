@@ -1,0 +1,141 @@
+/* http://clrs.cc/ */
+.bg-aqua{background-color:#7FDBFF}
+.bg-black{background-color:#111}
+.bg-blue{background-color:#0074D9}
+.bg-fuchsia{background-color:#F012BE}
+.bg-green{background-color:#2ECC40}
+.bg-lime{background-color:#01FF70}
+.bg-maroon{background-color:#85144B}
+.bg-navy{background-color:#001F3F}
+.bg-olive{background-color:#3D9970}
+.bg-orange{background-color:#FF851B}
+.bg-purple{background-color:#B10DC9}
+.bg-red{background-color:#FF4136}
+.bg-silver{background-color:#ddd}
+.bg-gray{background-color:#aaa}
+.bg-teal{background-color:#39CCCC}
+.bg-white{background-color:#fff}
+.bg-yellow{background-color:#FFDC00}
+.aqua{color:#7FDBFF}
+.blue{color:#0074D9}
+.navy{color:#001F3F}
+.teal{color:#39CCCC}
+.green{color:#2ECC40}
+.olive{color:#3D9970}
+.lime{color:#01FF70}
+.maroon{color:#85144B}
+.orange{color:#FF851B}
+.purple{color:#B10DC9}
+.red{color:#FF4136}
+.yellow{color:#FFDC00}
+.fuchsia{color:#F012BE}
+.silver{color:#ddd}
+.gray{color:#aaa}
+.white{color:#fff}
+.black{color:#111}
+
+/* UI elements */
+
+button {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: inherit;
+    padding: 7px 10px;
+}
+button:hover {
+	cursor: pointer;
+	border-color: #666;
+}
+
+/* Chekhov */
+
+body {
+	margin: 0 auto;
+	font-size: 14px;
+	line-height: 1.428571429;
+	width: 900px;
+}
+.pg-example {
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	display: table;
+	margin: 10px 0 20px 0;
+	position: relative;
+}
+.ck-output, .pg-code {
+	display: table-cell;
+	padding: 20px;
+}
+.ck-output {
+	min-width: 200px;
+}
+.CKOptionList {
+	background: #f5f5f5;
+	border: 1px dashed #999;
+	cursor: pointer;
+	display: inline-block;
+	padding: 0 3px;
+	position: relative;
+	z-index: 2;
+}
+.pg-code pre {
+	background-color: #f5f5f5;
+	border-radius: 5px;
+	margin: 0;
+	overflow: visible;
+	position: relative;
+}
+.pg-code pre code {
+	display: block;
+	padding: 20px;
+}
+.ck-code-wrapper .blanket {
+	background: rgba(0, 0, 0, 0.3);
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+}
+.ck-list-options {
+	background: #f5f5f5;
+	border: 1px dashed #999;
+	display: none;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	list-style: none;
+	z-index: 3;
+}
+.ck-list-options.active {
+	display: block;
+}
+.ck-list-options li {
+	margin: 0;
+	padding: 0 3px;
+}
+.ck-list-options li:hover {
+	background: #fff;
+	cursor: pointer;
+}
+.ck-list-options li:empty::before,
+.CKOptionList:empty::before {
+	content: '<default>';
+	color: #999;
+	cursor: pointer;
+	font-style: italic;
+}
+
+
+.pg-code pre .tag.poc-highlight,
+.pg-code pre .text.poc-highlight {
+	background-color: #ff6;
+}
+.poc-highlight-overlay {
+	background-color: #ff9; /* 8ab3bf */
+	opacity: 0.5;
+	position: absolute;
+	z-index: 10000;
+}

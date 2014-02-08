@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Chekhov's Gun</title>
+	<link rel="stylesheet" href="playground.css">
+</head>
+<body>
+	<div class="pg-example">
+		<div class="ck-output"></div>
+		<div class="pg-code">
+			<pre class="ck-code"><code>&lt;button class=&quot;demo-button <span data-var="btnClass" class="CKOptionList" data-values="bg-aqua|bg-black|bg-blue|bg-fuchsia|bg-green|bg-lime|bg-maroon|bg-navy">bg-blue</span>&quot;&gt;List, required value&lt;/button&gt;</code></pre>
+		</div>
+	</div>
+
+	<div class="pg-example">
+		<div class="ck-output"></div>
+		<div class="pg-code">
+			<pre class="ck-code"><code>&lt;button class=&quot;demo-button <span data-var="btnClass" class="CKOptionList" data-values="|bg-olive|bg-orange|bg-purple|bg-red|bg-silver|bg-gray|bg-teal|bg-white|bg-yellow"></span>&quot;&gt;List, optional value&lt;/button&gt;</code></pre>
+		</div>
+	</div>
+
+	<script src="Tangle/Tangle.js"></script>
+	<script src="chekhov.js"></script>
+	<script>
+		var cc = Chekhov.initAll('.pg-example');
+	</script>
+</body>
+</html>
