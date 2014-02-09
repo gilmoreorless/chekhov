@@ -23,9 +23,19 @@
 		</div>
 	</div>
 
+	<div class="pg-example">
+		<div class="ck-output"></div>
+		<div class="pg-code">
+			<pre class="ck-code"><code>&lt;div class=&quot;<span data-var="colourClass" class="CKOptionList" data-list="textColours"></span>&quot;&gt;Named list for colour&lt;/div&gt;
+&lt;button class=&quot;demo-button bg-<span data-var="colourClass" class="CKOptionList" data-list="textColours"></span>&quot;&gt;Same list, linked values&lt;/button&gt;
+&lt;button class=&quot;demo-button bg-<span data-var="otherClass" class="CKOptionList" data-list="textColours">green</span>&quot;&gt;Same list, not linked&lt;/button&gt;</code></pre>
+		</div>
+	</div>
+
 	<script src="Tangle/Tangle.js"></script>
 	<script src="chekhov.js"></script>
 	<script>
+		Chekhov.lists.textColours = ['aqua','black','blue','fuchsia','green','lime','maroon','navy','olive','orange','purple','red','silver','gray','teal','white','yellow'];
 		var cc = Chekhov.initAll('.pg-example');
 	</script>
 </body>

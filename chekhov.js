@@ -35,6 +35,8 @@ var Chekhov = (function () {
 		});
 	};
 
+	C.lists = {};
+
 	C.prototype.init = function () {
 		var vars = $$('[data-var]', this.codeElem).map(function (elem) {
 			return [elem.getAttribute('data-var'), elem.textContent.trim()];
@@ -63,15 +65,30 @@ var Chekhov = (function () {
 			console.log('CKOptionList.initialize', this, arguments);
 			var optList = this;
 			optList.variable = variable;
-			optList.values = (options.values || '').split('|');
-			optList.selected = elem.textContent;
+			optList.values = options.list && C.lists[options.list] || (options.values || '').split('|');
+			var curValue = elem.textContent;
+			// If provided value isn't in the list, choose the first option
+			if (optList.values.length && optList.values.indexOf(curValue) === -1) {
+				// TODO: Should really get the value out of Tangle, but tangle.initialize hasn't been run yet, annoying
+				var v = optList.values[0];
+				curValue = v;
+				// TODO: This is a case of Tangle getting in the way rather than helping
+				setTimeout(function () {
+					tangle.setValue(variable, v);
+				})
+			}
+			optList.selected = curValue;
 
-			var ul = document.createElement('ul');
-			ul.className = 'ck-list-options';
-			ul.innerHTML = this.values.map(function (value) {
-				var open = '<li' + (value === optList.selected ? ' class="selected"' : '') + '>';
-				return open + value + '</li>';
-			}).join('');
+			var ul = $('ul[data-for=' + variable + ']', tangle.element);
+			if (!ul) {
+				ul = document.createElement('ul');
+				ul.className = 'ck-list-options';
+				ul.setAttribute('data-for', variable);
+				ul.innerHTML = optList.values.map(function (value) {
+					var open = '<li' + (value === optList.selected ? ' class="selected"' : '') + '>';
+					return open + value + '</li>';
+				}).join('');
+			}
 
 			var blanket = document.createElement('div');
 			blanket.className = 'ck-list-blanket';
@@ -98,9 +115,10 @@ var Chekhov = (function () {
 				// to stop the code block from jumping around
 				elem.style.width = compStyle.width;
 				// Move the list to account for selected option's offsetTop
-				ul.style.left = left + 'px';
-				ul.style.top = (top - optList.offset) + 'px';
 				ul.classList.add('active');
+				var listOffset = getSelectedOffset();
+				ul.style.left = left + 'px';
+				ul.style.top = (top - listOffset) + 'px';
 				blanket.classList.add('active');
 			}, false);
 
@@ -125,7 +143,6 @@ var Chekhov = (function () {
 					e.target.classList.add('selected');
 					var value = e.target.textContent;
 					optList.selected = value;
-					optList.offset = getSelectedOffset();
 					hideList();
 				}
 			}, false);
@@ -136,7 +153,6 @@ var Chekhov = (function () {
 			tangle.element.appendChild(blanket);
 			// Quick show/hide to get proper option offset
 			ul.classList.add('active');
-			optList.offset = getSelectedOffset();
 			ul.classList.remove('active');
 		},
 		update: function (elem, value) {
