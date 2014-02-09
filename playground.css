@@ -36,6 +36,16 @@
 
 /* UI elements */
 
+body {
+	margin: 0 auto;
+	font-family: sans-serif;
+	font-size: 14px;
+	line-height: 1.428571429;
+	width: 900px;
+}
+h1 {
+	margin: 1.5em 0;
+}
 button {
     background-color: #eee;
     border: 1px solid #ccc;
@@ -47,15 +57,24 @@ button:hover {
 	cursor: pointer;
 	border-color: #666;
 }
+button.bg-black,
+button.bg-blue,
+button.bg-fuchsia,
+button.bg-maroon,
+button.bg-navy,
+button.bg-olive,
+button.bg-purple,
+button.bg-red,
+button.bg-gray
+{
+	color: #fff;
+}
+pre {
+	color: #730;
+}
 
 /* Chekhov */
 
-body {
-	margin: 0 auto;
-	font-size: 14px;
-	line-height: 1.428571429;
-	width: 900px;
-}
 .pg-example {
 	border: 1px solid #ccc;
 	border-radius: 3px;
@@ -90,9 +109,10 @@ body {
 	display: block;
 	padding: 20px;
 }
-.ck-code-wrapper .blanket {
+.ck-list-blanket {
 	background: rgba(0, 0, 0, 0.3);
 	bottom: 0;
+	display: none;
 	left: 0;
 	position: absolute;
 	right: 0;
@@ -109,6 +129,7 @@ body {
 	list-style: none;
 	z-index: 3;
 }
+.ck-list-blanket.active,
 .ck-list-options.active {
 	display: block;
 }

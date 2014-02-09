@@ -24,6 +24,7 @@
 
 - Theming
 - How the hell to handle JS APIs
+- Hande touch events for mobiles/tablets
 - Code generation
 	- Use something like CodeMirror to paste code into
 	- Highlight a section of code and get a context menu with various actions

@@ -61,36 +61,83 @@ var Chekhov = (function () {
 	Tangle.classes.CKOptionList = {
 		initialize: function (elem, options, tangle, variable) {
 			console.log('CKOptionList.initialize', this, arguments);
-			this.variable = variable;
-			this.values = (options.values || '').split('|');
-			this.selected = elem.textContent
-			var that = this;
+			var optList = this;
+			optList.variable = variable;
+			optList.values = (options.values || '').split('|');
+			optList.selected = elem.textContent;
 
 			var ul = document.createElement('ul');
 			ul.className = 'ck-list-options';
-			ul.innerHTML = this.values.map(function (value) { return '<li>' + value + '</li>'; }).join('');
+			ul.innerHTML = this.values.map(function (value) {
+				var open = '<li' + (value === optList.selected ? ' class="selected"' : '') + '>';
+				return open + value + '</li>';
+			}).join('');
+
+			var blanket = document.createElement('div');
+			blanket.className = 'ck-list-blanket';
+
+			function getSelectedOffset() {
+				var selected = $('.selected', ul);
+				return selected ? selected.offsetTop || 0 : 0;
+			}
+
+			function hideList() {
+				// Reset the span back to auto-adjusting width
+				elem.style.width = 'auto';
+				ul.classList.remove('active');
+				blanket.classList.remove('active');
+				tangle.setValue(variable, optList.selected);
+			}
+
+			// Hover on code span, show options list
 			elem.addEventListener('mouseover', function () {
+				var compStyle = getComputedStyle(elem);
+				var left = elem.offsetLeft;
+				var top = elem.offsetTop;
+				// Fix the width of the span while the list is open
+				// to stop the code block from jumping around
+				elem.style.width = compStyle.width;
+				// Move the list to account for selected option's offsetTop
+				ul.style.left = left + 'px';
+				ul.style.top = (top - optList.offset) + 'px';
 				ul.classList.add('active');
+				blanket.classList.add('active');
 			}, false);
+
+			// Hover out from options list, revert back to selected option
 			ul.addEventListener('mouseout', function (e) {
 				if (!ul.contains(e.relatedTarget)) {
-					ul.classList.remove('active');
-					tangle.setValue(variable, that.selected);
+					hideList();
 				}
 			}, false);
+
+			// Hover over options, change the value
 			ul.addEventListener('mouseover', function (e) {
 				if (e.target.nodeName === 'LI') {
 					tangle.setValue(variable, e.target.textContent);
 				}
 			}, false);
 
+			// Click on an option, set selected value
+			ul.addEventListener('click', function (e) {
+				if (e.target.nodeName === 'LI') {
+					$('.selected', ul).classList.remove('selected');
+					e.target.classList.add('selected');
+					var value = e.target.textContent;
+					optList.selected = value;
+					optList.offset = getSelectedOffset();
+					hideList();
+				}
+			}, false);
+
 			var style = getComputedStyle(elem);
-			var left = elem.offsetLeft;
-			var top = elem.offsetTop;
 			ul.style.color = style.color;
-			ul.style.left = left + 'px';
-			ul.style.top = top + 'px';
 			tangle.element.appendChild(ul);
+			tangle.element.appendChild(blanket);
+			// Quick show/hide to get proper option offset
+			ul.classList.add('active');
+			optList.offset = getSelectedOffset();
+			ul.classList.remove('active');
 		},
 		update: function (elem, value) {
 			console.log('CKOptionList.update', this, value);
