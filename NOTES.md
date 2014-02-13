@@ -1,7 +1,7 @@
 # Random thoughts
 
-- Do I handle just plain text, assume markup from syntax highlighters, or both?
-- Build on top of Tangle or make it standalone?
+- **Q:** Do I handle just plain text, assume markup from syntax highlighters, or both?
+- **Q:** Build on top of Tangle or make it standalone? **A:** Tried Tangle, it didn't quite do what I wanted, so standalone it is
 - Start with just markup/CSS-based examples; JS APIs are a problem for later
 - Composed of two main parts
 - **Part 1** - Changeable snippets

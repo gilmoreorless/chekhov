@@ -92,7 +92,7 @@ pre {
 .ck-output {
 	width: 200px;
 }
-.CKOptionList {
+.ck-control-optionList {
 	background: #f5f5f5;
 	border: 1px dashed #999;
 	cursor: pointer;
@@ -145,7 +145,7 @@ pre {
 	cursor: pointer;
 }
 .ck-list-options li:empty::before,
-.CKOptionList:empty::before {
+.ck-control-optionList:empty::before {
 	content: '<default>';
 	color: #999;
 	cursor: pointer;

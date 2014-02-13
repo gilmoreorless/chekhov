@@ -72,10 +72,12 @@ var Chekhov = (function () {
 			v.controls || (v.controls = []);
 			var controls = options.control.split('|');
 			each(controls, function (cls) {
-				if (C.controls[cls]) {
-					var ctrl = new Control(C.controls[cls], elem, options, ck);
-					v.controls.push(ctrl);
+				if (!C.controls[cls]) {
+					console.warn('No Chekhov control found with the name "' + cls + '"', elem);
+					return;
 				}
+				var ctrl = new Control(C.controls[cls], elem, options, ck);
+				v.controls.push(ctrl);
 			});
 			vars[varName] = v;
 			elem._chekhov = true;
@@ -144,9 +146,9 @@ var Chekhov = (function () {
 
 	/*** UI Controls ***/
 
-	C.controls.CKOptionList = {
+	C.controls.optionList = {
 		init: function () {
-			console.log('CKOptionList.init', this, arguments);
+			console.log('optionList.init', this, arguments);
 
 			var optList = this;
 			var elem = this.elem;
@@ -235,7 +237,7 @@ var Chekhov = (function () {
 				}
 			}, false);
 
-			elem.classList.add('CKOptionList');
+			elem.classList.add('ck-control-optionList');
 			var style = getComputedStyle(elem);
 			ul.style.color = style.color;
 			if (!ul.parentNode) {
@@ -247,7 +249,7 @@ var Chekhov = (function () {
 			ul.classList.remove('active');
 		},
 		update: function (value) {
-			console.log('CKOptionList.update', this, value);
+			console.log('optionList.update', this, value);
 			this.elem.textContent = value;
 		}
 	};
