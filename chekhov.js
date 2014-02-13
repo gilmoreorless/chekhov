@@ -1,5 +1,7 @@
-/* Dependencies: Tangle */
 var Chekhov = (function () {
+
+	/*** Helpers ***/
+
 	function A(list) {
 		return Array.prototype.slice.apply(list);
 	}
@@ -9,6 +11,20 @@ var Chekhov = (function () {
 	function $$(selector, root) {
 		return A((root || document).querySelectorAll(selector));
 	}
+	function oEach(obj, fn) {
+		Object.keys(obj).forEach(function (key) {
+			fn.call(obj, obj[key], key);
+		});
+	}
+	function each(obj, fn) {
+		if (Array.isArray(obj)) {
+			return obj.forEach(fn);
+		}
+		return oEach(obj, fn);
+	}
+
+
+	/*** Main Chekhov object ***/
 
 	var C = function Chekhov(elem) {
 		this.elem = elem;
@@ -21,7 +37,7 @@ var Chekhov = (function () {
 		// Wrap code contents in a container element
 		var div = document.createElement('div');
 		div.className = 'ck-code-wrapper';
-		A(this.codeElem.childNodes).forEach(function (node) {
+		each(A(this.codeElem.childNodes), function (node) {
 			div.appendChild(node);
 		});
 		this.codeElem.appendChild(div);
@@ -36,50 +52,120 @@ var Chekhov = (function () {
 	};
 
 	C.lists = {};
+	C.controls = {};
 
 	C.prototype.init = function () {
-		var vars = $$('[data-var]', this.codeElem).map(function (elem) {
-			return [elem.getAttribute('data-var'), elem.textContent.trim()];
+		var vars = this.vars = {};
+		var elems = $$('[data-var]', this.codeElem);
+		var ck = this;
+
+		// Collect vars and controls
+		each(elems, function (elem) {
+			if (elem._chekhov) return;
+			var options = getOptionsForElem(elem);
+			var varName = options['var'];
+			if (!varName) return;
+			var value = elem.textContent.trim();
+
+			var v = vars[varName] || {};
+			v.value = value;
+			v.controls || (v.controls = []);
+			var controls = options.control.split('|');
+			each(controls, function (cls) {
+				if (C.controls[cls]) {
+					var ctrl = new Control(C.controls[cls], elem, options, ck);
+					v.controls.push(ctrl);
+				}
+			});
+			vars[varName] = v;
+			elem._chekhov = true;
 		});
-		this.tangle = new Tangle(this.codeElem, {
-			initialize: function () {
-				console.log('Tangle.initialize', this);
-				vars.forEach(function (vv) {
-					this[vv[0]] = vv[1];
-				}, this);
-			},
-			update: this.update.bind(this)
+
+		// Init controls
+		each(vars, function (varObj, varName) {
+			each(varObj.controls, function (control, ctrlName) {
+				control.init();
+			});
 		});
-		this.tangle.chekhov = this;
+
+		this.update();
 	};
 
 	C.prototype.update = function () {
+		console.log('Chekhov.update', this);
 		this.outputElem.innerHTML = this.srcElem.textContent;
 	};
 
 
-	/*** Tangle ***/
+	/*** Tangle-like functionality (variable/state management) ***/
 
-	Tangle.classes.CKOptionList = {
-		initialize: function (elem, options, tangle, variable) {
-			console.log('CKOptionList.initialize', this, arguments);
+	function Control(model, elem, options, chekhov) {
+		for (var key in model) {
+			this[key] = model[key];
+		}
+		this.elem = elem;
+		this.options = options;
+		this.chekhov = chekhov;
+	}
+
+	function getOptionsForElem(elem) {
+		var options = {};
+		if (elem.dataset) {
+			each(elem.dataset, function (value, key) {
+				options[key] = value;
+			});
+		} else {
+			each(A(elem.attributes), function (attr) {
+				var name = attr.name;
+				if (name.length > 5 && name.substr(0, 5) === 'data-') {
+					options[name.substr(5)] = attr.value;
+				}
+			});
+		}
+		return options;
+	}
+
+	C.prototype.get = function (varName) {
+		return (this.vars[varName] || {}).value;
+	};
+
+	C.prototype.set = function (varName, value) {
+		var varObj = this.vars[varName];
+		if (!varObj) {
+			varObj = this.vars[varName] = {};
+		}
+		varObj.value = value;
+		each(varObj.controls, function (control) {
+			control.update(value);
+		});
+		this.update();
+	};
+
+
+	/*** UI Controls ***/
+
+	C.controls.CKOptionList = {
+		init: function () {
+			console.log('CKOptionList.init', this, arguments);
+
 			var optList = this;
-			optList.variable = variable;
+			var elem = this.elem;
+			var options = this.options;
+			var chekhov = this.chekhov;
+
+			var variable = options['var'];
 			optList.values = options.list && C.lists[options.list] || (options.values || '').split('|');
-			var curValue = elem.textContent;
+			var curValue = chekhov.get(variable);
 			// If provided value isn't in the list, choose the first option
 			if (optList.values.length && optList.values.indexOf(curValue) === -1) {
-				// TODO: Should really get the value out of Tangle, but tangle.initialize hasn't been run yet, annoying
 				var v = optList.values[0];
 				curValue = v;
-				// TODO: This is a case of Tangle getting in the way rather than helping
-				setTimeout(function () {
-					tangle.setValue(variable, v);
-				})
+				chekhov.set(variable, curValue);
 			}
 			optList.selected = curValue;
 
-			var ul = $('ul[data-for=' + variable + ']', tangle.element);
+			var ul = $('ul[data-for=' + variable + ']', this.chekhov.codeElem);
+			var blanket = $('.ck-list-blanket[data-for=' + variable + ']', this.chekhov.codeElem);
 			if (!ul) {
 				ul = document.createElement('ul');
 				ul.className = 'ck-list-options';
@@ -88,10 +174,12 @@ var Chekhov = (function () {
 					var open = '<li' + (value === optList.selected ? ' class="selected"' : '') + '>';
 					return open + value + '</li>';
 				}).join('');
+
+				blanket = document.createElement('div');
+				blanket.className = 'ck-list-blanket';
+				blanket.setAttribute('data-for', variable);
 			}
 
-			var blanket = document.createElement('div');
-			blanket.className = 'ck-list-blanket';
 
 			function getSelectedOffset() {
 				var selected = $('.selected', ul);
@@ -103,7 +191,7 @@ var Chekhov = (function () {
 				elem.style.width = 'auto';
 				ul.classList.remove('active');
 				blanket.classList.remove('active');
-				tangle.setValue(variable, optList.selected);
+				chekhov.set(variable, optList.selected);
 			}
 
 			// Hover on code span, show options list
@@ -132,7 +220,7 @@ var Chekhov = (function () {
 			// Hover over options, change the value
 			ul.addEventListener('mouseover', function (e) {
 				if (e.target.nodeName === 'LI') {
-					tangle.setValue(variable, e.target.textContent);
+					chekhov.set(variable, e.target.textContent);
 				}
 			}, false);
 
@@ -147,17 +235,20 @@ var Chekhov = (function () {
 				}
 			}, false);
 
+			elem.classList.add('CKOptionList');
 			var style = getComputedStyle(elem);
 			ul.style.color = style.color;
-			tangle.element.appendChild(ul);
-			tangle.element.appendChild(blanket);
+			if (!ul.parentNode) {
+				this.chekhov.codeElem.appendChild(ul);
+				this.chekhov.codeElem.appendChild(blanket);
+			}
 			// Quick show/hide to get proper option offset
 			ul.classList.add('active');
 			ul.classList.remove('active');
 		},
-		update: function (elem, value) {
+		update: function (value) {
 			console.log('CKOptionList.update', this, value);
-			elem.textContent = value;
+			this.elem.textContent = value;
 		}
 	};
 
