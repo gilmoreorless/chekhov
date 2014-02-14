@@ -92,15 +92,6 @@ pre {
 .ck-output {
 	width: 200px;
 }
-.ck-control-optionList {
-	background: #f5f5f5;
-	border: 1px dashed #999;
-	cursor: pointer;
-	display: inline-block;
-	padding: 0 3px;
-	position: relative;
-	z-index: 2;
-}
 .pg-code pre {
 	background-color: #f5f5f5;
 	border-radius: 5px;
@@ -112,46 +103,9 @@ pre {
 	display: block;
 	padding: 20px;
 }
-.ck-list-blanket {
-	background: rgba(0, 0, 0, 0.3);
-	bottom: 0;
-	display: none;
-	left: 0;
-	position: absolute;
-	right: 0;
-	top: 0;
-	z-index: 1;
-}
-.ck-list-options {
-	background: #f5f5f5;
-	border: 1px dashed #999;
-	display: none;
-	margin: 0;
-	padding: 0;
-	position: absolute;
-	list-style: none;
-	z-index: 3;
-}
-.ck-list-blanket.active,
-.ck-list-options.active {
-	display: block;
-}
-.ck-list-options li {
-	margin: 0;
-	padding: 0 3px;
-}
-.ck-list-options li:hover {
-	background: #fff;
-	cursor: pointer;
-}
-.ck-list-options li:empty::before,
-.ck-control-optionList:empty::before {
-	content: '<default>';
-	color: #999;
-	cursor: pointer;
-	font-style: italic;
-}
 
+
+/** Code highlighting - yet to be ported over from POC **/
 
 .pg-code pre .tag.poc-highlight,
 .pg-code pre .text.poc-highlight {
