@@ -97,6 +97,20 @@ var Chekhov = (function () {
 		console.log('Chekhov.update', this);
 		this.outputElem.innerHTML = this.srcElem.textContent;
 	};
+	
+	function varElemClassManip(method) {
+		return function (varName, className) {
+			var v = this.vars[varName];
+			if (v && v.controls.length) {
+				each(v.controls, function (control) {
+					control.elem.classList[method](className);
+				});
+			}
+		};
+	}
+	
+	C.prototype.addClass = varElemClassManip('add');
+	C.prototype.removeClass = varElemClassManip('remove');
 
 
 	/*** Tangle-like functionality (variable/state management) ***/
@@ -109,7 +123,7 @@ var Chekhov = (function () {
 		this.options = options;
 		this.chekhov = chekhov;
 	}
-
+	
 	function getOptionsForElem(elem) {
 		var options = {};
 		if (elem.dataset) {
@@ -193,6 +207,7 @@ var Chekhov = (function () {
 				elem.style.width = 'auto';
 				ul.classList.remove('active');
 				blanket.classList.remove('active');
+				chekhov.removeClass(variable, 'active');
 				chekhov.set(variable, optList.selected);
 			}
 
@@ -210,6 +225,8 @@ var Chekhov = (function () {
 				ul.style.left = left + 'px';
 				ul.style.top = (top - listOffset) + 'px';
 				blanket.classList.add('active');
+				// Highlight all linked elems
+				chekhov.addClass(variable, 'active');
 			}, false);
 
 			// Hover out from options list, revert back to selected option
