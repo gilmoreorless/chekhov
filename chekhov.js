@@ -23,6 +23,21 @@ var Chekhov = (function () {
 		return oEach(obj, fn);
 	}
 
+	/*** Debug logging ***/
+
+	USE_LOGGING = 1;
+
+	function log(name) {
+		if (!USE_LOGGING) return;
+		var indentStr = new Array(log.stackLen + 1).join('  ');
+		var args = [indentStr + '#' + ('id' in this ? this.id : '-') + ' ' + name]
+			.concat(Array.prototype.slice.call(arguments, 1));
+		console.log.apply(console, args);
+		log.stackLen++;
+	}
+	log.stackLen = 0;
+	log.exit = function () { log.stackLen--; };
+
 
 	/*** Main Chekhov object ***/
 
@@ -84,8 +99,8 @@ var Chekhov = (function () {
 		});
 
 		// Init controls
-		each(vars, function (varObj, varName) {
-			each(varObj.controls, function (control, ctrlName) {
+		each(vars, function (varObj) {
+			each(varObj.controls, function (control) {
 				control.init();
 			});
 		});
@@ -94,10 +109,13 @@ var Chekhov = (function () {
 	};
 
 	C.prototype.update = function () {
-		console.log('Chekhov.update', this);
+		log.call(this, 'chekhov.update');
+
 		this.outputElem.innerHTML = this.srcElem.textContent;
+
+		log.exit();
 	};
-	
+
 	function varElemClassManip(method) {
 		return function (varName, className) {
 			var v = this.vars[varName];
@@ -108,22 +126,24 @@ var Chekhov = (function () {
 			}
 		};
 	}
-	
+
 	C.prototype.addClass = varElemClassManip('add');
 	C.prototype.removeClass = varElemClassManip('remove');
 
 
 	/*** Tangle-like functionality (variable/state management) ***/
 
+	var cid = 0;
 	function Control(model, elem, options, chekhov) {
 		for (var key in model) {
 			this[key] = model[key];
 		}
+		this.id = cid++;
 		this.elem = elem;
 		this.options = options;
 		this.chekhov = chekhov;
 	}
-	
+
 	function getOptionsForElem(elem) {
 		var options = {};
 		if (elem.dataset) {
@@ -146,15 +166,22 @@ var Chekhov = (function () {
 	};
 
 	C.prototype.set = function (varName, value) {
+		log.call(this, 'chekhov.set', varName, value);
+
 		var varObj = this.vars[varName];
 		if (!varObj) {
 			varObj = this.vars[varName] = {};
 		}
-		varObj.value = value;
-		each(varObj.controls, function (control) {
-			control.update(value);
-		});
-		this.update();
+		var oldValue = varObj.value;
+		if (oldValue !== value) {
+			varObj.value = value;
+			each(varObj.controls, function (control) {
+				control.update(value);
+			});
+			this.update();
+		}
+
+		log.exit();
 	};
 
 
@@ -162,7 +189,7 @@ var Chekhov = (function () {
 
 	C.controls.optionList = {
 		init: function () {
-			console.log('optionList.init', this, arguments);
+			log.call(this, 'optionList.init', this);
 
 			var optList = this;
 			var elem = this.elem;
@@ -198,21 +225,37 @@ var Chekhov = (function () {
 
 
 			function getSelectedOffset() {
+				log.call(optList, 'getSelectedOffset');
+				log.exit();
+
 				var selected = $('.selected', ul);
 				return selected ? selected.offsetTop || 0 : 0;
 			}
 
 			function hideList() {
-				// Reset the span back to auto-adjusting width
-				elem.style.width = 'auto';
+				log.call(optList, 'hideList', ul);
+
+				// Avoid extra DOM writes when a mouseout directly follows a click
+				if (optList._clicked) {
+					delete optList._clicked;
+					log.exit();
+					return;
+				}
+
 				ul.classList.remove('active');
 				blanket.classList.remove('active');
 				chekhov.removeClass(variable, 'active');
 				chekhov.set(variable, optList.selected);
+				// Reset the span back to auto-adjusting width
+				elem.style.width = 'auto';
+
+				log.exit();
 			}
 
 			// Hover on code span, show options list
 			elem.addEventListener('mouseover', function () {
+				log.call(optList, 'elem.mouseover', elem);
+
 				var compStyle = getComputedStyle(elem);
 				var left = elem.offsetLeft;
 				var top = elem.offsetTop;
@@ -227,30 +270,45 @@ var Chekhov = (function () {
 				blanket.classList.add('active');
 				// Highlight all linked elems
 				chekhov.addClass(variable, 'active');
+
+				log.exit();
 			}, false);
 
 			// Hover out from options list, revert back to selected option
 			ul.addEventListener('mouseout', function (e) {
 				if (!ul.contains(e.relatedTarget)) {
+					log.call(optList, 'ul.mouseout');
+
 					hideList();
+
+					log.exit();
 				}
 			}, false);
 
 			// Hover over options, change the value
 			ul.addEventListener('mouseover', function (e) {
 				if (e.target.nodeName === 'LI') {
+					log.call(optList, 'li.mouseover', e.target);
+
 					chekhov.set(variable, e.target.textContent);
+
+					log.exit();
 				}
 			}, false);
 
 			// Click on an option, set selected value
 			ul.addEventListener('click', function (e) {
 				if (e.target.nodeName === 'LI') {
+					log.call(optList, 'li.click');
+
 					$('.selected', ul).classList.remove('selected');
 					e.target.classList.add('selected');
 					var value = e.target.textContent;
 					optList.selected = value;
 					hideList();
+					optList._clicked = true;
+
+					log.exit();
 				}
 			}, false);
 
@@ -264,10 +322,15 @@ var Chekhov = (function () {
 			// Quick show/hide to get proper option offset
 			ul.classList.add('active');
 			ul.classList.remove('active');
+
+			log.exit();
 		},
 		update: function (value) {
-			console.log('optionList.update', this, value);
+			log.call(this, 'optionList.update', this, value);
+
 			this.elem.textContent = value;
+
+			log.exit();
 		}
 	};
 

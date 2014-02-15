@@ -6,9 +6,9 @@
 - Composed of two main parts
 - **Part 1** - Changeable snippets
 	- Look for data attrs in code snippet to create interactive sections
-		- Change text based on a pipe-separated string of values
-		- Change text based on a named list (defined elsewhere)
-		- Auto-change texts that rely on the same named list
+		- ✓ Change text based on a pipe-separated string of values
+		- ✓ Change text based on a named list (defined elsewhere)
+		- ✓ Auto-change texts that rely on the same named list
 		- Toggle display of a section via manual selection
 		- Toggle display of a section based on a dependency (e.g. another element with `id="blah"` having a specific value)
 		- Define a section as "cloneable" and allow adding/removing clones via click
