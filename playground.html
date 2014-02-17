@@ -33,10 +33,25 @@
 		</div>
 	</div>
 
+	<div class="pg-example">
+		<div class="ck-output"></div>
+		<div class="pg-code">
+			<pre class="ck-code"><code>&lt;div class=&quot;split-container&quot;&gt;
+  &lt;button class=&quot;bg-silver <span data-var="btnSplit" data-control="optionList" data-values="|split-main"></span>&quot;&gt;Toggle other elems&lt;/button&gt;
+<span data-var="btnSplit" data-control="toggle" data-show-value="split-main">  &lt;button class=&quot;bg-silver split-more&quot;&gt;more&lt;/button&gt;</span>
+&lt;/div&gt;
+<span data-var="btnSplit" data-control="toggle" data-hide-value="split-main">Not a split button</span></code></pre>
+		</div>
+	</div>
+
 	<script src="chekhov.js"></script>
 	<script>
 		Chekhov.lists.textColours = ['aqua','black','blue','fuchsia','green','lime','maroon','navy','olive','orange','purple','red','silver','gray','teal','white','yellow'];
-		var cc = Chekhov.initAll('.pg-example');
+		var cc;
+		// setTimeout for debugging purposes
+		setTimeout(function () {
+			cc = Chekhov.initAll('.pg-example');
+		}, 0);
 	</script>
 </body>
 </html>

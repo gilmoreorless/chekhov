@@ -10,10 +10,10 @@
 		- ✓ Change text based on a named list (defined elsewhere)
 		- ✓ Auto-change texts that rely on the same named list
 		- Toggle display of a section via manual selection
-		- Toggle display of a section based on a dependency (e.g. another element with `id="blah"` having a specific value)
+		- ✓ Toggle display of a section based on a dependency (e.g. another element with `id="blah"` having a specific value)
 		- Define a section as "cloneable" and allow adding/removing clones via click
 		- Number value adjustment (e.g. width attr)
-	- JS API to define lists of options
+	- ✓ JS API to define lists of options
 - **Part 2** - Linked highlighting
 	- Hover on element -> highlight code open/close tags
 	- Hover on code tag -> highlight element (with an overlay), plus related (open/close) tag

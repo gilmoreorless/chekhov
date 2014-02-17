@@ -70,9 +70,10 @@ var Chekhov = (function () {
 	C.controls = {};
 
 	C.prototype.init = function () {
-		var vars = this.vars = {};
-		var elems = $$('[data-var]', this.codeElem);
 		var ck = this;
+		var vars = ck.vars = {};
+		var elems = $$('[data-var]', ck.codeElem);
+		ck._initSetQueue = [];
 
 		// Collect vars and controls
 		each(elems, function (elem) {
@@ -105,7 +106,21 @@ var Chekhov = (function () {
 			});
 		});
 
-		this.update();
+		// Handle any delayed updates from setting variables
+		if (ck._initSetQueue.length) {
+			log.call(this, 'run _initSetQueue');
+
+			each(ck._initSetQueue, function (varObj) {
+				each(varObj.controls, function (control) {
+					control.update(varObj.value);
+				});
+			});
+
+			log.exit();
+		}
+
+		delete ck._initSetQueue;
+		ck.update();
 	};
 
 	C.prototype.update = function () {
@@ -154,7 +169,10 @@ var Chekhov = (function () {
 			each(A(elem.attributes), function (attr) {
 				var name = attr.name;
 				if (name.length > 5 && name.substr(0, 5) === 'data-') {
-					options[name.substr(5)] = attr.value;
+					name = name.substr(5).replace(/-(\w)/g, function (part, char) {
+						return char.toUpperCase();
+					});
+					options[name] = attr.value;
 				}
 			});
 		}
@@ -166,7 +184,7 @@ var Chekhov = (function () {
 	};
 
 	C.prototype.set = function (varName, value) {
-		log.call(this, 'chekhov.set', varName, value);
+		log.call(this, 'chekhov.set', varName, value, this._initSetQueue ? '(_initSetQueue)' : '');
 
 		var varObj = this.vars[varName];
 		if (!varObj) {
@@ -175,10 +193,15 @@ var Chekhov = (function () {
 		var oldValue = varObj.value;
 		if (oldValue !== value) {
 			varObj.value = value;
-			each(varObj.controls, function (control) {
-				control.update(value);
-			});
-			this.update();
+			if (this._initSetQueue) {
+				// Queue the updates for later to avoid interrupting the init of all controls
+				this._initSetQueue.push(varObj);
+			} else {
+				each(varObj.controls, function (control) {
+					control.update(value);
+				});
+				this.update();
+			}
 		}
 
 		log.exit();
@@ -187,6 +210,14 @@ var Chekhov = (function () {
 
 	/*** UI Controls ***/
 
+
+	/**
+	 * Allow choosing a value from a defined list - great for changing class names
+	 *
+	 * Attribute options
+	 *  data-values: A pipe-separated list of possible values (e.g. "one|two|three")
+	 *  data-list: Name of a list of possible values, defined as a property on Chekhov.lists - this overrides `data-values`
+	 */
 	C.controls.optionList = {
 		init: function () {
 			log.call(this, 'optionList.init', this);
@@ -329,6 +360,38 @@ var Chekhov = (function () {
 			log.call(this, 'optionList.update', this, value);
 
 			this.elem.textContent = value;
+
+			log.exit();
+		}
+	};
+
+
+	/**
+	 * Show or hide text based on a variable's content
+	 *
+	 * Attribute options (use one, not both)
+	 *  data-show-value: Only show element when variable has this value
+	 *  data-hide-value: Show element unless variable has this value
+	 */
+	C.controls.toggle = {
+		init: function () {
+			log.call(this, 'toggle.init');
+
+			this.text = this.elem.textContent;
+			this.update(this.chekhov.get(this.options['var']));
+
+			log.exit();
+		},
+		update: function (value) {
+			var shouldShow = true;
+			if (('hideValue' in this.options && this.options.hideValue === value) ||
+				('showValue' in this.options && this.options.showValue !== value)) {
+				shouldShow = false;
+			}
+			log.call(this, 'toggle.update', value, shouldShow);
+
+			// TODO: This is naive, as it will wipe out any child nodes for other controls
+			this.elem.textContent = shouldShow ? this.text : ' ';
 
 			log.exit();
 		}

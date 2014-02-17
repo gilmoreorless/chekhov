@@ -53,7 +53,8 @@ button {
     background-color: #eee;
     border: 1px solid #ccc;
     border-radius: 3px;
-    font-size: inherit;
+    font-size: 14px;
+    margin: 5px 0 0 0;
     padding: 7px 10px;
 }
 button:hover {
@@ -72,6 +73,37 @@ button.bg-gray
 {
 	color: #fff;
 }
+.split-container {
+	font-size: 0;
+}
+button.split-main {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+button.split-more {
+	border-left-width: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	padding-left: 18px;
+	position: relative;
+	text-indent: -9999em;
+}
+button.split-more:hover {
+	border-left-width: 1px;
+	margin-left: -1px;
+}
+button.split-more:after {
+	border: 5px solid transparent;
+	border-top-color: #000;
+	content: '';
+	height: 0;
+	left: 50%;
+	margin: -2px 0 0 -5px;
+	position: absolute;
+	top: 50%;
+	width: 0;
+}
+
 pre {
 	color: #730;
 }
