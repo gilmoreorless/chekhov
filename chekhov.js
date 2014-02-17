@@ -22,6 +22,12 @@ var Chekhov = (function () {
 		}
 		return oEach(obj, fn);
 	}
+	function wrapChildren(parent, wrapper) {
+		each(A(parent.childNodes), function (node) {
+			wrapper.appendChild(node);
+		});
+		parent.appendChild(wrapper);
+	}
 
 	/*** Debug logging ***/
 
@@ -52,10 +58,7 @@ var Chekhov = (function () {
 		// Wrap code contents in a container element
 		var div = document.createElement('div');
 		div.className = 'ck-code-wrapper';
-		each(A(this.codeElem.childNodes), function (node) {
-			div.appendChild(node);
-		});
-		this.codeElem.appendChild(div);
+		wrapChildren(this.codeElem, div);
 		this.srcElem = div;
 		this.init();
 	};
@@ -84,17 +87,17 @@ var Chekhov = (function () {
 			var value = elem.textContent.trim();
 
 			var v = vars[varName] || {};
-			v.value = value;
 			v.controls || (v.controls = []);
-			var controls = options.control.split('|');
-			each(controls, function (cls) {
-				if (!C.controls[cls]) {
-					console.warn('No Chekhov control found with the name "' + cls + '"', elem);
-					return;
-				}
-				var ctrl = new Control(C.controls[cls], elem, options, ck);
-				v.controls.push(ctrl);
-			});
+			var controlName = options.control;
+			if (!C.controls[controlName]) {
+				console.warn('No Chekhov control found with the name "' + controlName + '"', elem);
+				return;
+			}
+			var ctrl = new Control(C.controls[controlName], elem, options, ck);
+			v.controls.push(ctrl);
+			if (ctrl.setVar) {
+				v.value = value;
+			}
 			vars[varName] = v;
 			elem._chekhov = true;
 		});
@@ -169,8 +172,8 @@ var Chekhov = (function () {
 			each(A(elem.attributes), function (attr) {
 				var name = attr.name;
 				if (name.length > 5 && name.substr(0, 5) === 'data-') {
-					name = name.substr(5).replace(/-(\w)/g, function (part, char) {
-						return char.toUpperCase();
+					name = name.substr(5).replace(/-(\w)/g, function (_, c) {
+						return c.toUpperCase();
 					});
 					options[name] = attr.value;
 				}
@@ -219,6 +222,7 @@ var Chekhov = (function () {
 	 *  data-list: Name of a list of possible values, defined as a property on Chekhov.lists - this overrides `data-values`
 	 */
 	C.controls.optionList = {
+		setVar: true,
 		init: function () {
 			log.call(this, 'optionList.init', this);
 
@@ -377,7 +381,8 @@ var Chekhov = (function () {
 		init: function () {
 			log.call(this, 'toggle.init');
 
-			this.text = this.elem.textContent;
+			this.wrapper = document.createElement('span');
+			wrapChildren(this.elem, this.wrapper);
 			this.update(this.chekhov.get(this.options['var']));
 
 			log.exit();
@@ -390,8 +395,13 @@ var Chekhov = (function () {
 			}
 			log.call(this, 'toggle.update', value, shouldShow);
 
-			// TODO: This is naive, as it will wipe out any child nodes for other controls
-			this.elem.textContent = shouldShow ? this.text : ' ';
+			if (shouldShow) {
+				this.elem.textContent = '';
+				this.elem.appendChild(this.wrapper);
+			} else {
+				this.elem.removeChild(this.wrapper);
+				this.elem.textContent = ' ';
+			}
 
 			log.exit();
 		}
