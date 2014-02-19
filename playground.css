@@ -46,8 +46,8 @@ body {
 	line-height: 1.428571429;
 	width: 1000px;
 }
-h1 {
-	margin: 1.5em 0;
+h2:first-child {
+	margin-top: 2em;
 }
 button {
     background-color: #eee;
@@ -104,11 +104,38 @@ button.split-more:after {
 	width: 0;
 }
 
+.icon {
+	color: #333;
+	display: inline-block;
+	height: 16px;
+	margin-right: 3px;
+	position: relative;
+	vertical-align: bottom;
+	width: 16px;
+}
+.icon-play:before {
+	border: 2px solid #333;
+	border-radius: 50%;
+	box-sizing: border-box;
+	content: '';
+	display: block;
+	height: 16px;
+	width: 16px;
+}
+.icon-play:after {
+	content: '▶';
+	font-size: 10px;
+	left: 4px;
+	position: absolute;
+	top: 2px;
+}
+
 pre {
 	color: #730;
 }
 
-/* Chekhov */
+
+/* Chekhov-related */
 
 .pg-example {
 	border: 1px solid #ccc;

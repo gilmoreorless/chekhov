@@ -10,6 +10,8 @@
 <body>
 	<h1>This is here for padding purposes</h1>
 
+	<h2>Control: <code>optionList</code></h2>
+
 	<div class="pg-example">
 		<div class="ck-output"></div>
 		<div class="pg-code">
@@ -33,14 +35,28 @@
 		</div>
 	</div>
 
+
+	<h2>Control: <code>toggleAuto</code></h2>
+
 	<div class="pg-example">
 		<div class="ck-output"></div>
 		<div class="pg-code">
 			<pre class="ck-code"><code>&lt;div class=&quot;split-container&quot;&gt;
   &lt;button class=&quot;bg-silver <span data-var="btnSplit" data-control="optionList" data-values="|split-main"></span>&quot;&gt;Toggle other elems&lt;/button&gt;
-<span data-var="btnSplit" data-control="toggle" data-show-value="split-main">  &lt;button class=&quot;bg-silver split-more&quot;&gt;more&lt;/button&gt;</span>
+<span data-var="btnSplit" data-control="toggleAuto" data-show-value="split-main">  &lt;button class=&quot;bg-silver split-more&quot;&gt;more&lt;/button&gt;</span>
 &lt;/div&gt;
-<span data-var="btnSplit" data-control="toggle" data-hide-value="split-main">Not a split <span data-var="msg" data-control="optionList" data-values="button|- this is just here to make sure sub-controls work">button</span></span></code></pre>
+<span data-var="btnSplit" data-control="toggleAuto" data-hide-value="split-main">Not a split <span data-var="msg" data-control="optionList" data-values="button|- this is just here to make sure sub-controls work">button</span></span></code></pre>
+		</div>
+	</div>
+
+	<h2>Control: <code>toggleManual</code></h2>
+
+	<div class="pg-example">
+		<div class="ck-output"></div>
+		<div class="pg-code">
+			<pre class="ck-code"><code>&lt;button class=&quot;bg-lime&quot;&gt;
+  <span data-control="toggleManual" data-start-hidden="true">&lt;span class=&quot;icon icon-play&quot;&gt;&lt;/span&gt;</span> Manually toggle items
+&lt;/button&gt;</code></pre>
 		</div>
 	</div>
 

@@ -9,6 +9,7 @@
 	border: 1px dashed #999;
 	cursor: pointer;
 	display: inline-block;
+	margin: -1px 0;
 	padding: 0 3px;
 	position: relative;
 }
@@ -53,4 +54,20 @@
 	color: #999;
 	cursor: pointer;
 	font-style: italic;
+}
+
+
+/* Control: toggle(Auto|Manual) */
+
+.ck-control-toggle:empty::before {
+	content: ' ';
+}
+.ck-control-toggle-manual:empty::before {
+	content: '[show]';
+	color: #999;
+	cursor: pointer;
+	font-style: italic;
+}
+.ck-control-toggle-manual:hover {
+	cursor: pointer;
 }

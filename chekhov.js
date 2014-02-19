@@ -75,7 +75,7 @@ var Chekhov = (function () {
 	C.prototype.init = function () {
 		var ck = this;
 		var vars = ck.vars = {};
-		var elems = $$('[data-var]', ck.codeElem);
+		var elems = $$('[data-control]', ck.codeElem);
 		ck._initSetQueue = [];
 
 		// Collect vars and controls
@@ -83,17 +83,20 @@ var Chekhov = (function () {
 			if (elem._chekhov) return;
 			var options = getOptionsForElem(elem);
 			var varName = options['var'];
-			if (!varName) return;
-			var value = elem.textContent.trim();
 
-			var v = vars[varName] || {};
-			v.controls || (v.controls = []);
 			var controlName = options.control;
 			if (!C.controls[controlName]) {
 				console.warn('No Chekhov control found with the name "' + controlName + '"', elem);
 				return;
 			}
 			var ctrl = new Control(C.controls[controlName], elem, options, ck);
+
+			if (!varName) {
+				varName = '__none__';
+			}
+			var value = elem.textContent.trim();
+			var v = vars[varName] || {};
+			v.controls || (v.controls = []);
 			v.controls.push(ctrl);
 			if (ctrl.setVar) {
 				v.value = value;
@@ -162,11 +165,17 @@ var Chekhov = (function () {
 		this.chekhov = chekhov;
 	}
 
+	function stringToBool(value) {
+		return value === 'true' ? true :
+			value === 'false' ? false :
+			value;
+	}
+
 	function getOptionsForElem(elem) {
 		var options = {};
 		if (elem.dataset) {
 			each(elem.dataset, function (value, key) {
-				options[key] = value;
+				options[key] = stringToBool(value);
 			});
 		} else {
 			each(A(elem.attributes), function (attr) {
@@ -175,7 +184,7 @@ var Chekhov = (function () {
 					name = name.substr(5).replace(/-(\w)/g, function (_, c) {
 						return c.toUpperCase();
 					});
-					options[name] = attr.value;
+					options[name] = stringToBool(attr.value);
 				}
 			});
 		}
@@ -377,12 +386,14 @@ var Chekhov = (function () {
 	 *  data-show-value: Only show element when variable has this value
 	 *  data-hide-value: Show element unless variable has this value
 	 */
-	C.controls.toggle = {
+	C.controls.toggleAuto = {
 		init: function () {
-			log.call(this, 'toggle.init');
+			log.call(this, 'toggleAuto.init');
 
 			this.wrapper = document.createElement('span');
 			wrapChildren(this.elem, this.wrapper);
+			this.elem.classList.add('ck-control-toggle');
+			this.elem.classList.add('ck-control-toggle-auto');
 			this.update(this.chekhov.get(this.options['var']));
 
 			log.exit();
@@ -393,15 +404,52 @@ var Chekhov = (function () {
 				('showValue' in this.options && this.options.showValue !== value)) {
 				shouldShow = false;
 			}
-			log.call(this, 'toggle.update', value, shouldShow);
+			log.call(this, 'toggleAuto.update', value, shouldShow);
 
-			if (shouldShow) {
-				this.elem.textContent = '';
-				this.elem.appendChild(this.wrapper);
-			} else {
-				this.elem.removeChild(this.wrapper);
-				this.elem.textContent = ' ';
+			var method = shouldShow ? 'appendChild' : 'removeChild';
+			this.elem[method](this.wrapper);
+
+			log.exit();
+		}
+	};
+
+
+	/**
+	 * Show or hide text when user clicks on the element
+	 *
+	 * Attribute options
+	 *  data-start-hidden: If "true", make element hidden after init
+	 */
+	C.controls.toggleManual = {
+		init: function () {
+			log.call(this, 'toggleManual.init');
+
+			var ctrl = this;
+			ctrl.wrapper = document.createElement('span');
+			wrapChildren(ctrl.elem, ctrl.wrapper);
+			ctrl.elem.classList.add('ck-control-toggle');
+			ctrl.elem.classList.add('ck-control-toggle-manual');
+
+			ctrl.show = !ctrl.options.startHidden;
+
+			ctrl.elem.addEventListener('click', function () {
+				ctrl.show = !ctrl.show;
+				ctrl.update(ctrl.show);
+			}, false);
+
+			if (!ctrl.show) {
+				ctrl.update(false);
 			}
+
+			log.exit();
+		},
+		update: function (value) {
+			var shouldShow = value === false ? false : true;
+			log.call(this, 'toggleManual.update', value, shouldShow);
+
+			var method = shouldShow ? 'appendChild' : 'removeChild';
+			this.elem[method](this.wrapper);
+			this.chekhov.update();
 
 			log.exit();
 		}
