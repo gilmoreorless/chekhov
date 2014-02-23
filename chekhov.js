@@ -357,8 +357,25 @@ var Chekhov = (function () {
 			}, false);
 
 			elem.classList.add('ck-control-optionList');
-			var style = getComputedStyle(elem);
-			ul.style.color = style.color;
+			var fgColour, bgColour, style;
+			var styleElem = elem;
+			var rTrans = /^transparent|rgba\(0, 0, 0, 0\)$/;
+			while (!(fgColour && bgColour) && styleElem !== this.chekhov.elem.parentNode) {
+				style = getComputedStyle(styleElem);
+				if (!fgColour) {
+					fgColour = style.color;
+				}
+				if (!bgColour && !rTrans.test(style.backgroundColor)) {
+					bgColour = style.backgroundColor;
+				}
+				styleElem = styleElem.parentNode;
+			}
+			ul.style.color = fgColour;
+			if (bgColour) {
+				ul.style.backgroundColor = bgColour;
+			} else {
+				ul.classList.add('ck-default-bg');
+			}
 			if (!ul.parentNode) {
 				this.chekhov.codeElem.appendChild(ul);
 				this.chekhov.codeElem.appendChild(blanket);
