@@ -1,23 +1,35 @@
+/*** Generic items ***/
+
 .ck-code {
 	position: relative;
 }
-
-/* Control: optionList */
-
-.ck-control-optionList {
-	background: #f5f5f5;
+.ck-outline {
 	border: 1px dashed #999;
 	cursor: pointer;
 	display: inline-block;
 	margin: -1px 0;
 	padding: 0 3px;
+}
+
+
+/*** Control: optionList ***/
+
+/**
+ * z-index layering:
+ *
+ *  3 - .ck-list-options
+ *  2 - .ck-control-optionList.active
+ *  1 - .ck-list-blanket
+ */
+
+.ck-control-optionList {
 	position: relative;
 }
 .ck-control-optionList.active {
 	z-index: 2;
 }
 .ck-list-blanket {
-	background: rgba(0, 0, 0, 0.3);
+	background: rgba(0, 0, 0, 0.25);
 	bottom: 0;
 	display: none;
 	left: 0;
@@ -27,14 +39,17 @@
 	z-index: 1;
 }
 .ck-list-options {
-	background: #f5f5f5;
-	border: 1px dashed #999;
+	cursor: pointer;
 	display: none;
 	margin: 0;
+	border: 1px dashed #999;
 	padding: 0;
 	position: absolute;
 	list-style: none;
 	z-index: 3;
+}
+.ck-list-options.ck-default-bg {
+	background: #f5f5f5;
 }
 .ck-list-blanket.active,
 .ck-list-options.active {
@@ -46,7 +61,6 @@
 }
 .ck-list-options li:hover {
 	background: #fff;
-	cursor: pointer;
 }
 .ck-list-options li:empty::before,
 .ck-control-optionList:empty::before {
@@ -57,17 +71,20 @@
 }
 
 
-/* Control: toggle(Auto|Manual) */
+/*** Control: toggle(Auto|Manual) ***/
 
+.ck-control-toggle-manual {
+	cursor: pointer;
+}
+.ck-control-toggle-manual:hover {
+	background-color: #fff;
+}
 .ck-control-toggle:empty::before {
 	content: ' ';
 }
 .ck-control-toggle-manual:empty::before {
-	content: '[show]';
+	content: attr(data-hidden-text);
 	color: #999;
 	cursor: pointer;
 	font-style: italic;
-}
-.ck-control-toggle-manual:hover {
-	cursor: pointer;
 }

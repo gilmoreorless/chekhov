@@ -28,6 +28,16 @@ var Chekhov = (function () {
 		});
 		parent.appendChild(wrapper);
 	}
+	function getPlaceholderText(elem) {
+		var text = elem.textContent.trim();
+		var match = text.match(/^(<\S+)[\s>]/);
+		if (match) {
+			text = match[1] + '…' + '>';
+		} else {
+			text = text.substr(0, 5) + '…';
+		}
+		return text;
+	}
 
 	/*** Debug logging ***/
 
@@ -357,6 +367,7 @@ var Chekhov = (function () {
 			}, false);
 
 			elem.classList.add('ck-control-optionList');
+			elem.classList.add('ck-outline');
 			var fgColour, bgColour, style;
 			var styleElem = elem;
 			var rTrans = /^transparent|rgba\(0, 0, 0, 0\)$/;
@@ -434,22 +445,30 @@ var Chekhov = (function () {
 	/**
 	 * Show or hide text when user clicks on the element
 	 *
-	 * Attribute options
+	 * Attribute options (all optional)
 	 *  data-start-hidden: If "true", make element hidden after init
+	 *  data-hidden-text: Placeholder text to use in hidden mode (e.g. "<icon>")
 	 */
 	C.controls.toggleManual = {
 		init: function () {
 			log.call(this, 'toggleManual.init');
 
 			var ctrl = this;
+			var elem = ctrl.elem;
+
 			ctrl.wrapper = document.createElement('span');
-			wrapChildren(ctrl.elem, ctrl.wrapper);
-			ctrl.elem.classList.add('ck-control-toggle');
-			ctrl.elem.classList.add('ck-control-toggle-manual');
+			wrapChildren(elem, ctrl.wrapper);
+			elem.classList.add('ck-control-toggle');
+			elem.classList.add('ck-control-toggle-manual');
+			elem.classList.add('ck-outline');
+			if (!ctrl.options.hiddenText) {
+				var text = ctrl.options.hiddenText = getPlaceholderText(elem);
+				elem.setAttribute('data-hidden-text', text);
+			}
 
 			ctrl.show = !ctrl.options.startHidden;
 
-			ctrl.elem.addEventListener('click', function () {
+			elem.addEventListener('click', function () {
 				ctrl.show = !ctrl.show;
 				ctrl.update(ctrl.show);
 			}, false);
