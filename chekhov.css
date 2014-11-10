@@ -106,3 +106,24 @@
 .ck-control-toggle-manual:empty:hover::after {
 	content: 'show';
 }
+
+
+/*** Control: clone ***/
+
+.ck-control-clone {
+	cursor: pointer;
+	position: relative;
+}
+.ck-control-clone:hover {
+	background-color: #fff;
+}
+.ck-control-clone::after {
+	content: '+';
+	color: #33f;
+	font-family: sans-serif;
+	font-size: 0.9em;
+	padding: 0 2px 0 4px;
+}
+.ck-control-clone:hover::after {
+	content: 'clone';
+}

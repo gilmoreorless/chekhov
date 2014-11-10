@@ -492,6 +492,48 @@ var Chekhov = (function () {
 	};
 
 
+	/**
+	 * Clone an element
+	 *
+	 * Attribute options
+	 *  data-clone-insert: "before" or "after" (default is "after") - where to place the clone, relative to the original
+	 */
+	C.controls.clone = {
+		init: function () {
+			log.call(this, 'clone.init');
+
+			var ctrl = this;
+			var elem = ctrl.elem;
+			elem.classList.add('ck-control-clone');
+			elem.classList.add('ck-outline');
+
+			ctrl.count = 1;
+			ctrl.clickHandler = function () {
+				this.update(this.count + 1);
+			}.bind(ctrl);
+			elem.addEventListener('click', ctrl.clickHandler, false);
+
+			log.exit();
+		},
+		update: function (value) {
+			log.call(this, 'clone.update', value);
+
+			this.count = value;
+			var clone = this.elem.cloneNode(true);
+			clone.addEventListener('click', this.clickHandler, false);
+			clone.setAttribute('data-clone-count', value);
+
+			var parent = this.elem.parentNode;
+			var isBefore = this.options.cloneInsert === 'before';
+			parent.insertBefore(clone, isBefore ? this.elem : this.elem.nextSibling);
+			parent.insertBefore(document.createTextNode('\n'), isBefore ? this.elem : clone);
+			this.chekhov.update();
+
+			log.exit();
+		}
+	};
+
+
 	return C;
 
 })();

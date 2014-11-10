@@ -129,6 +129,31 @@ button.split-more:after {
 	position: absolute;
 	top: 2px;
 }
+.blob-wrapper {
+	font-size: 0;
+	margin-top: 7px;
+}
+.blob {
+	background-color: #ff851a;
+	border: 1px solid #aa5409;
+	box-sizing: border-box;
+	display: inline-block;
+	font-size: 12px;
+	height: 20px;
+	line-height: 1.5;
+	padding: 0 4px;
+}
+.blob:first-child {
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+}
+.blob:last-child {
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+.blob + .blob {
+	border-left-width: 0;
+}
 
 pre {
 	color: #730;

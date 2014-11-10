@@ -1,7 +1,8 @@
 # Random thoughts
 
 - **Q:** Do I handle just plain text, assume markup from syntax highlighters, or both?
-- **Q:** Build on top of Tangle or make it standalone? **A:** Tried Tangle, it didn't quite do what I wanted, so standalone it is
+- **Q:** Build on top of Tangle or make it standalone?
+  **A:** Tried Tangle, it didn't quite do what I wanted, so standalone it is
 - Start with just markup/CSS-based examples; JS APIs are a problem for later
 - Composed of two main parts
 - **Part 1** - Changeable snippets
@@ -14,6 +15,7 @@
 		- Define a section as "cloneable" and allow adding/removing clones via click
 		- Number value adjustment (e.g. width attr)
 	- ✓ JS API to define lists of options
+	- Accessibility
 - **Part 2** - Linked highlighting
 	- Hover on element -> highlight code open/close tags
 	- Hover on code tag -> highlight element (with an overlay), plus related (open/close) tag
@@ -24,7 +26,7 @@
 
 - Theming
 - How the hell to handle JS APIs
-- Hande touch events for mobiles/tablets
+- Handle touch events for mobiles/tablets
 - Code generation
 	- Use something like CodeMirror to paste code into
 	- Highlight a section of code and get a context menu with various actions
