@@ -140,7 +140,7 @@ button.split-more:after {
 	display: inline-block;
 	font-size: 12px;
 	height: 20px;
-	line-height: 1.5;
+	line-height: 1.66667;
 	padding: 0 4px;
 }
 .blob:first-child {
@@ -185,6 +185,7 @@ pre {
 }
 .pg-code pre code {
 	display: block;
+	min-width: 400px;
 	padding: 20px;
 }
 

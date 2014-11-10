@@ -57,7 +57,10 @@ var Chekhov = (function () {
 
 	/*** Main Chekhov object ***/
 
+	var uid = 0;
+
 	var C = function Chekhov(elem) {
+		this.id = uid++;
 		this.elem = elem;
 		this.outputElem = $('.ck-output', elem);
 		this.codeElem = $('.ck-code', elem);
@@ -164,12 +167,11 @@ var Chekhov = (function () {
 
 	/*** Tangle-like functionality (variable/state management) ***/
 
-	var cid = 0;
 	function Control(model, elem, options, chekhov) {
 		for (var key in model) {
 			this[key] = model[key];
 		}
-		this.id = cid++;
+		this.id = uid++;
 		this.elem = elem;
 		this.options = options;
 		this.chekhov = chekhov;
@@ -493,10 +495,7 @@ var Chekhov = (function () {
 
 
 	/**
-	 * Clone an element
-	 *
-	 * Attribute options
-	 *  data-clone-insert: "before" or "after" (default is "after") - where to place the clone, relative to the original
+	 * Clone an element - the clone gets place immediately after the original
 	 */
 	C.controls.clone = {
 		init: function () {
@@ -507,26 +506,22 @@ var Chekhov = (function () {
 			elem.classList.add('ck-control-clone');
 			elem.classList.add('ck-outline');
 
-			ctrl.count = 1;
 			ctrl.clickHandler = function () {
-				this.update(this.count + 1);
-			}.bind(ctrl);
+				ctrl.update(this);
+			};
 			elem.addEventListener('click', ctrl.clickHandler, false);
 
 			log.exit();
 		},
-		update: function (value) {
-			log.call(this, 'clone.update', value);
+		update: function (elem) {
+			log.call(this, 'clone.update', elem);
 
-			this.count = value;
-			var clone = this.elem.cloneNode(true);
+			var clone = elem.cloneNode(true);
 			clone.addEventListener('click', this.clickHandler, false);
-			clone.setAttribute('data-clone-count', value);
 
-			var parent = this.elem.parentNode;
-			var isBefore = this.options.cloneInsert === 'before';
-			parent.insertBefore(clone, isBefore ? this.elem : this.elem.nextSibling);
-			parent.insertBefore(document.createTextNode('\n'), isBefore ? this.elem : clone);
+			var parent = elem.parentNode;
+			parent.insertBefore(clone, elem.nextSibling);
+			parent.insertBefore(document.createTextNode('\n'), clone);
 			this.chekhov.update();
 
 			log.exit();
